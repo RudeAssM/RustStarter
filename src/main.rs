@@ -1,13 +1,15 @@
 extern crate core;
 
-      //|\\
-     //-|-\\
-    //-/|\-\\
-   //-/-|-\-\\
-  //-/--|--\-\\
- //-/--/|\--\-\\
-//-/--/-|-\--\-\\
-
+         //|\\
+        //-|-\\
+       //-/|\-\\
+      //-/-|-\-\\
+     //-/--|--\-\\
+    //-/--/|\--\-\\
+   //-/--/-|-\--\-\\
+  //-/--/--|--\--\-\\
+ //-/--/---|---\--\-\\
+//-------------------\\
 
 use std::io;
 use rand::Rng;
@@ -22,36 +24,170 @@ fn main() {
 
 }
 
-
-
-
-fn slices(){
-
-    fn first_word(s: &String) -> usize{
-        let bytes = s.as_bytes();//This converts a string to an array of bytes
-
-        for(index, &item) in bytes.iter().enumerate(){
-            //the for loop defines i as the increasing num
-            //&item is the value of each byte at said increasing num
-            //&item should be each byte which is iter() and enumarate()
-            //iter() iterates throuh given values
-            //enumarate() returns a tuple of the index and the item
-            if item == b' '{
-                return index;
-            }
+fn enums() {
+    {
+        enum IpTypes {
+            V4,
+            V6,
         }
-        s.lent()
 
-        //the issue with this method is that we can save the value using the function
-        // but we are able to modify the string after leaving the int num the original value
+        let four = IpTypes::v4;
+        let six = IpTypes::V6;
+    }
+    {
+        enum  IpTypes{
+            V4(String),
+            V6(String),
+        }
+
+        let home = IpTypes::V4(String::from("127.0.0.1"));
+        let loopback = IpTypes::v6(String::from("::1"));
+    }
+    {
+        enum IpTypes{
+            V4(u8,u8,u8,u8),
+            V6(String),
+        }
+
+        let home = IpTypes::V4(127, 0, 0, 1);
+
+        let loopback = IpTypes::V6(String::from("::1"));
     }
 
-    //the solution to this issue is to refrence certain parts of a string
 
-    let s = String::from("hwllo world");
 
-    let hello = &s[0..5];
-    let world = &s[6..11];
+}
+
+fn an_example_struct_pgm() {
+    #[derive(Debug)]// allows printablity of structs
+    struct Rectangle {
+        width: u32,
+        height: u32,
+    }
+    //-----v1-----\\
+    {
+        let rect1 = Rectangle {
+            width: 30,
+            height: 50,
+        };
+
+        println!("the area of the rect is {}", area(&rect1));
+
+        fn area(rectangle: &Rectangle) -> u32 {
+            rectangle.width * rectangle.height
+        }
+    }
+    //-----v2-----\\
+    {
+        let rect1 = Rectangle {//this is not printable by itself
+            width: 30,
+            height: 50,
+        };
+        // we require :? to do run debug output
+        println!("rect1 us {:?}", rect1);
+        // we can also write :#? so that its more readable
+        // we can also use:
+        dbg!(&rect1);
+        //
+    }
+
+    {
+        //this is a method.it defines a function on a struct
+        impl Rectangle {
+            fn area(&self) -> u32 {
+                self.width * self.height
+            }
+            fn width(&self) -> bool {
+                self.width > 0
+            }
+            fn can_hold(&self, other: &Rectangle) -> bool {
+                self.width > other.width && self.height > other.height
+            }
+
+            fn square(size: u32)-> Self{
+                Self{
+                    width: size,
+                    height: size,
+                }
+            }
+
+        }
+
+
+        let rect1 = Rectangle {
+            width: 30,
+            height: 50,
+        };
+
+        println!("area of rectum : {}", rect1.area());
+        println!("the rect is {}", rect1.width);
+    }
+    {
+
+    }
+
+}
+
+fn structs(){
+
+    // this is a struct it is similar to a tuple but
+    // we define the names of the values
+    struct User {
+        active: bool,
+        username: String,
+        email: String,
+        sign_in_count: u64,
+    }
+
+    // we can create instances of these systems
+
+    let mut user1 = User{
+        active:true,
+        username: String::from("someone@example.com"),
+        email:String::from("some username123"),
+        sign_in_count: 1,
+    };
+
+
+    user1.email = String::from("anotheremail@sss.com");
+
+    // if we wanna copy a struct this is one way of doing it
+    let user2 = User{
+        active: user1.active,
+        username: user1.username,
+        email: String::from("someemail@email.email"),
+        sign_in_count: user1.sign_in_count,
+    };
+
+    //but if we are only updating only certain things we can writer:
+    let user3 = User{
+        username: String::from("aaaah"),
+        ..user2//has to be last
+    };
+
+    fn build_user(email: String, username: String) -> User{
+        User{
+            email,
+            //username: username tedious and pointless There is a better way!!
+            username,
+            active: true,
+            sign_in_count: 1,
+        }
+    }
+
+    //-----tuple-structs-----\\
+
+    struct Color(i32,i32,i32);
+    struct Point(i32,i32,i32);
+
+    let black = Color(0,0,0);
+    let origin = Point(0,0,0);
+
+    //-----unit-like struct-----\\
+
+    struct AlwaysEqual;
+    let subject = AlwaysEqual;
+
 
 
 
@@ -62,15 +198,73 @@ fn slices(){
 
 }
 
-fn refrences_borrowing(){
+fn slices(){
+
+    fn first_word(s: &String) -> usize{
+        let bytes = s.as_bytes();//This converts a string to an array of bytes
+
+        for(index, &item) in bytes.iter().enumerate(){
+            //the for loop defines i as the increasing num
+            //&item is the value of each byte at said increasing num
+            //&item should be each byte which is iter() and enumerate()
+            //iter() iterates through given values
+            //enumerate() returns a tuple of the index and the item
+            if item == b' '{
+                return index;
+            }
+        }
+        s.len()
+
+        //the issue with this method is that we can save the value using the function
+        // but we are able to modify the string after leaving the int num the original value
+    }
+
+    //the solution to this issue is to reference certain parts of a string
+
+    let s = String::from("hello world");
+
+    let hello = &s[0..5];
+    let world = &s[6..11];
+    // this is a slice where the square brackets indicate
+    // what indexes of the string we wish to use
+    let sl = &s[0..2];
+    let sl2 = &s[..2];
+    let sl3 = &s[3..s.len()];
+
+    fn first_word2(s: &String) -> &str{
+        let bytes = s.as_bytes();
+
+        for (i, &item)  in bytes.iter().enumerate() {
+            if item == b' '{
+                return &s[0..i];
+            }
+
+        }
+        &s[..]
+    }
+
+    let a = [1,2,3,4,5];
+    let slice = &a[1..3];
+
+    assert_eq!(slice,&[2, 3]);
+
+
+
+
+
+
+
+}
+
+fn references_borrowing(){
 
     let s1 = String::from("hello");
 
-    let len = calculate_length(&s1);// & infront is how we show refrence
+    let len = calculate_length(&s1);// & in-front is how we show reference
 
     println!("the length of {} is {}", s1, len);
 
-    //the & opperator is a pointer, it points to someone else
+    //the & operator is a pointer, it points to someone else
 
     fn calculate_length(s: &String) ->usize{
         s.len()
@@ -86,7 +280,7 @@ fn refrences_borrowing(){
     fn change(some_string: &String) {
         some_string.push_str(", world");
     }
-    *///this code above will not work as we are only passing the refrence
+    *///this code above will not work as we are only passing the reference
 
     //----------soloution to this problem-----------\\
 
