@@ -11,20 +11,126 @@ extern crate core;
  //-/--/---|---\--\-\\
 //-------------------\\
 
-use std::io;
+use std::{io,cmp::Ordering,ffi::c_void,mem::take,ops::Index,os::linux::raw::stat,io:: Bytes};
+use std::collections::HashMap;
+use std::ffi::c_char;
 use rand::Rng;
-use std::cmp::Ordering;
-use std::ffi::c_void;
-use std::io:: Bytes;
-use std::mem::take;
-use std::ops::Index;
-use std::os::linux::raw::stat;
+
+pub mod expansion; // allows implementation of this file
+use crate::expansion::this_is_a_module; // implements specific module not just entire class
+use crate::expansion::this_is_a_module::a_function as fa; // rename a funct
 
 fn main() {
 
 }
 
 
+
+
+fn collections() {
+    {
+        let mut v: Vec<i32> = Vec::new(); //an empty vector
+
+        let v2 = vec![1, 2, 3]; //a vector w 3 elements
+
+        v.push(5);
+        v.push(3);//adding values to vector
+
+        let third = &v2.get(2);//refrencing values in a vector
+
+
+        let third: Option<&i32> = v2.get(2);
+        match third {
+            Some(third) => println!("this is the third element"),
+            None => println!("there isnt a third element"),
+        }
+    }
+
+    {
+        let mut v = vec![1,4,6,8];
+
+        for i in &v{
+            println!("{}", i);
+        }
+
+        for i in &mut v{
+            *i += 50;
+        }
+    }
+
+    {
+        enum this{
+            Int(i32),
+            Float(f32),
+            Char(char),
+        }
+
+        let row = vec![
+            this::Int(2),
+            this::Float(32.2),
+            this::Char('C')
+        ];
+    }
+
+    let v_v = vec![vec![1,3,5],vec![1,3,4]]; //nested vector
+
+    {
+        let mut scores = HashMap::new();
+
+        scores.insert(String::from("blue"),10);
+        scores.insert(String::from("red"),20);
+
+        let score = scores
+            .get("blue")
+            .copied()//changes from &i32 to i32
+            .unwrap_or(0)//returns 0 ands sets value to 0 if None
+        ;
+
+        for (key, value) in &scores {
+            println!("{}: {}", key, value);
+        }
+
+        let name = String::from("this");
+
+        scores.insert(name,32);
+        // we loose acess to name here as it is stolen by the insert
+
+    }
+    {
+        let text = "hello world wonderful world";
+
+        let mut map = HashMap::new();
+
+        for word in text.split_whitespace() {
+            let count =
+                map
+                .entry(word)
+                .or_insert(0);
+            *count += 1;
+        }
+
+        println!("{:?}", map);
+    }
+
+
+}
+
+fn scope(){
+
+
+
+    pub fn a_funct(){
+        //absolute path
+        crate::expansion::this_is_a_module::this_is_a_mod_in_a_mod::b_function();
+
+        // relative path
+        expansion::this_is_a_module::a_function();
+        fa();
+    }
+
+
+
+}
 
 fn if_let(){
     {
@@ -105,8 +211,8 @@ fn c_match() {
     let none = plus_one(None);
 
     // match constructs are exhaustive they have to have an output for all inputs
-    let NumReturn = 1;
-    match NumReturn{
+    let num_return = 1;
+    match num_return {
         3 => println!("i do something"),
         7 => println!("i do something"),
         other => println!("SOMETHING ELSE")
