@@ -28,7 +28,75 @@ fn main() {
 
 }
 
-fn
+fn traits(){
+
+    pub trait Summary{// basically an interface
+        fn something(&self) -> String;
+    }
+
+    pub struct This{
+        pub head: String,
+        pub body: String,
+        pub end: String,
+    }
+
+    pub struct Tweet{
+        pub username: String,
+        pub content: String,
+        pub status: bool,
+    }
+
+    impl summary for This{
+        fn something(&self) -> String {
+            format!("{},{},{}" self.head, self.body, self.end)
+        }
+    }
+
+    impl Summary for Tweet{
+        fn something(&self) -> String{
+            format!("{} is {}",self.username,self.status)
+        }
+    }
+
+
+
+
+}
+
+fn generic_types(){
+
+
+    fn something<T>(list: &[T]) -> &T{
+
+        let largest = &list[0];
+        // do something
+        largest
+    }
+
+
+    struct Point<T>{
+        x: T,
+        y: T,
+        z: T,
+    }
+
+    let int = Point{ x: 5, y: 6 , z: 8 };
+    let float = Point{ x: 5.5, y: 6.6, z: 8.8 };
+    let char = Point{ x: 'C', y: 'D' , z: 'E' };
+
+    struct PPT<T>{
+        x: T,
+        y: T,
+    }
+
+    impl<T> PPT<T>{
+        fn x(&self) -> &T{
+            &self.x
+        }
+    }
+
+
+}
 
 fn error_handlin(){
     let greeting_file_result = File::open("hello.txt");
@@ -96,7 +164,7 @@ fn collections() {
     }
 
     {
-        enum this{
+        enum This{
             Int(i32),
             Float(f32),
             Char(char),
