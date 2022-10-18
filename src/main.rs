@@ -1,5 +1,6 @@
 extern crate core;
 
+
          //|\\
         //-|-\\
        //-/|\-\\
@@ -11,9 +12,12 @@ extern crate core;
  //-/--/---|---\--\-\\
 //-------------------\\
 
-use std::{io,cmp::Ordering,ffi::c_void,mem::take,ops::Index,os::linux::raw::stat,io:: Bytes};
+
+use std::{io, cmp::Ordering, ffi::c_void, mem::take, ops::Index, os::linux::raw::stat, io:: Bytes};
 use std::collections::HashMap;
 use std::ffi::c_char;
+use std::fs::File;
+use std::io::ErrorKind;
 use rand::Rng;
 
 pub mod expansion; // allows implementation of this file
@@ -24,8 +28,41 @@ fn main() {
 
 }
 
+fn
 
+fn error_handlin(){
+    let greeting_file_result = File::open("hello.txt");
 
+    let greeting_file = match greeting_file_result {
+        Ok(file) => file,
+        Err(error) => panic!("probs the problem was with: {:?}", error),
+    };//here we only want to catch the error but we dont specify
+
+    {
+        let greeting_file_result = File::open("hello.txt");
+
+        let greeting_file = match greeting_file_result {
+            Ok(file) => file,
+            Err(error) => match error.kind() {
+                ErrorKind::NotFound => match File::create("hello.txt") {
+                    Ok(fc) => fc,
+                    Err(e) => panic!("Problem creating the file: {:?}", e),
+                },
+                other_error => {
+                    panic!("Problem opening the file: {:?}", other_error);
+                }
+            },
+        };
+    }
+
+    {
+        let greeting_file = File::open("hello.txt").unwrap();
+        //vs
+        let greeting_file2 = File::open("hello.txt")
+                                    .expect("hello.txt should be in proj");
+
+    }
+}
 
 fn collections() {
     {
@@ -81,9 +118,9 @@ fn collections() {
         scores.insert(String::from("red"),20);
 
         let score = scores
-            .get("blue")
-            .copied()//changes from &i32 to i32
-            .unwrap_or(0)//returns 0 ands sets value to 0 if None
+                        .get("blue")
+                        .copied()//changes from &i32 to i32
+                        .unwrap_or(0)//returns 0 ands sets value to 0 if None
         ;
 
         for (key, value) in &scores {
