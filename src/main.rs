@@ -16,6 +16,7 @@ extern crate core;
 use std::{io, cmp::Ordering, ffi::c_void, mem::take, ops::Index, os::linux::raw::stat, io:: Bytes};
 use std::collections::HashMap;
 use std::ffi::c_char;
+use std::fmt::{Debug,Display};
 use std::fs::File;
 use std::io::ErrorKind;
 use rand::Rng;
@@ -27,12 +28,72 @@ use crate::expansion::this_is_a_module::a_function as fa; // rename a funct
 fn main() {
 
 }
+fn tests(){
+
+
+
+
+
+}
+
+fn lifetime(){
+
+    let string1 = String::from("abdca");
+    let string2 = "xyz";
+
+    let result = longest(string1.as_str(),string2);
+    println!("longest string is {}", result);
+
+    struct MajorImport<'a>{
+        part: &'a str,
+    }
+
+    let novel = String::from("call me Ishmael. gay boi");
+    let first_sent =novel.split('.').next().expect("Could not find '.'");
+    let i = MajorImport {
+        part:first_sent,
+    };
+
+    impl<'a> MajorImport<'a>{
+        fn level(&self) -> i32{
+            3
+        }
+        fn announce_and_return_part(&self, announcment: &str) -> &str{
+            print!("attention pls {}", announcment);
+            self.part
+        }
+    }
+    let s: & 'static str = "i have a static lifetime";
+
+
+    fn longest_with_an_announcment<'a , T>( x: &'a str, y: &'a str, ann: T) -> &'a str where T: Display{
+
+
+        print!("this is the announcment: {}", ann);
+        if x.len() > y.len(){
+            x
+        }else {
+            y
+        }
+
+    }
+
+}
+
+pub fn longest<'a>(x: &'a str, y:&'a str) -> &'a  str{
+    if x.len() > y.len(){
+        x
+    }else {
+        y
+    }
+}
 
 fn traits(){
 
     pub trait Summary{// basically an interface
         fn something(&self) -> String;
     }
+
 
     pub struct This{
         pub head: String,
@@ -46,9 +107,9 @@ fn traits(){
         pub status: bool,
     }
 
-    impl summary for This{
+    impl Summary for This{
         fn something(&self) -> String {
-            format!("{},{},{}" self.head, self.body, self.end)
+            format!("{},{},{}",self.head, self.body, self.end)
         }
     }
 
@@ -58,6 +119,54 @@ fn traits(){
         }
     }
 
+    fn notify( item: &impl Summary){
+        println!("breaking news {}", item.something());
+    }
+
+    fn notify2<T: Summary>(item: &T){
+        println!("breaking news! {}", item.something());
+    }
+
+    pub fn notify3(item: &(impl Summary + Display)){
+
+    }
+    fn notify4<T: Summary + Display>(item: &T){
+
+    }
+
+
+    // if we want to implement this on multiple variables it would be too long
+    // so we can use the where operator to simplify it
+
+    fn some_f<T, U>(t: &T, u: &U)
+        where
+            T: Display + Clone,
+            U:Clone + Debug, {
+
+    }
+
+    {
+        struct Pair<T>{
+            x: T,
+            y: T,
+        }
+
+        impl<T> Pair<T>{
+            fn new(x: T, y: T) ->Self{
+                Self{x, y}
+            }
+        }
+
+        impl<T: Display + PartialOrd> Pair<T>{
+            fn cmp_display(&self){
+                if self.x >= self.y{
+                    println!("the larg is x: {}",self.x);
+                }else{
+                    println!("the larg is y:{}",self.y);
+                }
+            }
+        }
+    }
 
 
 
@@ -171,9 +280,9 @@ fn collections() {
         }
 
         let row = vec![
-            this::Int(2),
-            this::Float(32.2),
-            this::Char('C')
+            This::Int(2),
+            This::Float(32.2),
+            This::Char('C')
         ];
     }
 
